@@ -13,7 +13,7 @@ import (
     "github.com/spf13/viper"
     //"github.com/go-errors/errors"
     
-    "WireguardManager/utils/config"
+    "WireguardLDAPManager/utils/config"
 )
 
 var Lock *sync.RWMutex

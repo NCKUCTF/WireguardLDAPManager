@@ -1,4 +1,4 @@
-module WireguardManager
+module WireguardLDAPManager
 
 go 1.19
 

@@ -3,7 +3,7 @@ package main
 import (
     "os"
 
-    "WireguardManager/router"
+    "WireguardLDAPManager/router"
 )
 
 func main() {

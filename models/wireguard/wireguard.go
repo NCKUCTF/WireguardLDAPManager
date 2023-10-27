@@ -14,7 +14,7 @@ import (
 
     "github.com/google/uuid"
 
-    "WireguardManager/utils/config"
+    "WireguardLDAPManager/utils/config"
 )
 
 func init() {

@@ -1,6 +1,6 @@
 builder := go
 builddir := bin
-exe := $(builddir)/wgmanager
+exe := $(builddir)/wgldapmanager
 #config := .env.sample
 #systemd := piproxyclient.service
 #install := install.sh
@@ -22,4 +22,4 @@ $(exe): main.go go.mod go.sum models router utils
 .PHONY = clean
 
 clean: 
-		rm -r $(builddir)
+		rm -rf $(builddir)

@@ -8,9 +8,9 @@ import (
     "strings"
     "strconv"
     "net/netip"
-    "WireguardManager/models/wireguard"
-    "WireguardManager/utils/ldap"
-    "WireguardManager/utils/ipcalc"
+    "WireguardLDAPManager/models/wireguard"
+    "WireguardLDAPManager/utils/ldap"
+    "WireguardLDAPManager/utils/ipcalc"
 )
 
 var f *flag.FlagSet

@@ -3,8 +3,8 @@ package router
 import (
     "fmt"
     "flag"
-    "WireguardManager/router/help"
-    "WireguardManager/router/reconfig"
+    "WireguardLDAPManager/router/help"
+    "WireguardLDAPManager/router/reconfig"
 )
 
 var f *flag.FlagSet
