@@ -5,6 +5,7 @@ import (
     "flag"
     "WireguardLDAPManager/router/help"
     "WireguardLDAPManager/router/reconfig"
+    "WireguardLDAPManager/router/showconfig"
 )
 
 var f *flag.FlagSet
@@ -41,6 +42,7 @@ func Setup(name string) {
     help.Usage = Usage
     help.Setup("help")
     reconfig.Setup("reconfig")
+    showconfig.Setup("showconfig")
 }
 
 func Run(args []string) {
@@ -54,6 +56,8 @@ func Run(args []string) {
         help.Run(subargs[1:])
     case "reconfig":
         reconfig.Run(subargs[1:])
+    case "showconfig":
+        showconfig.Run(subargs[1:])
     default:
         run(subargs)
     }

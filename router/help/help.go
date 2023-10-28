@@ -4,6 +4,7 @@ import (
     "fmt"
     "flag"
     "WireguardLDAPManager/router/reconfig"
+    "WireguardLDAPManager/router/showconfig"
 )
 
 var f *flag.FlagSet
@@ -27,6 +28,8 @@ func Run(args []string) {
         Usage()
     case "reconfig":
         reconfig.Usage()
+    case "showconfig":
+        showconfig.Usage()
     default:
         fmt.Fprintf(f.Output(), "Unknown command: '%s' (try without commands for a list of commands)\n", subargs[0])
     }

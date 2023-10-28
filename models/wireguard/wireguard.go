@@ -3,7 +3,6 @@ package wireguard
 import (
     "fmt"
     "log"
-    "io"
     "os"
     "os/exec"
     "bufio"
@@ -11,10 +10,14 @@ import (
     "strconv"
     "path/filepath"
     "regexp"
+    "net/netip"
 
     "github.com/google/uuid"
 
     "WireguardLDAPManager/utils/config"
+    "WireguardLDAPManager/utils/ldap"
+    "WireguardLDAPManager/utils/ipcalc"
+    "WireguardLDAPManager/models/privatekey"
 )
 
 func init() {
@@ -26,7 +29,19 @@ func init() {
 
 func GetAllName() []string {
     out, _ := exec.Command("wg", "show", "interfaces").Output()
+    if len(out) == 0 {
+        log.Fatalln("There don't have any wireguard server on this machine. Please create a wireguard server.")
+    }
     return strings.Split(strings.TrimSpace(string(out)), " ")
+}
+
+func ContainName(name string) bool {
+    for _, nowname := range GetAllName() {
+        if nowname == name {
+            return true
+        }
+    }
+    return false
 }
 
 func ReadName() string {
@@ -113,24 +128,37 @@ func SetConfig(name, conf string) {
     exec.Command("wg", "syncconf", name, fmt.Sprintf("/tmp/%s", tmpname)).Run()
 }
 
-func Pubkey(privkey string) string {
-    cmd := exec.Command("wg", "pubkey")
-    stdin, err := cmd.StdinPipe()
-    if err != nil {
-        log.Fatalln(err)
+func Reconfig() {
+    entrys, _ := ldap.Query("", "(objectclass=wireguardKey)")
+    splitcom := regexp.MustCompile(`\s*,\s*`)
+    for _, name := range GetAllName() {
+        conf, servervar := GetConfig(name)
+        conf += "\n"
+        addressesarr := splitcom.Split(servervar["Address"], -1)
+        for _, entry := range entrys {
+            ipindex, err := strconv.ParseInt(entry.GetAttributeValue("ipindex"), 10, 64)
+            if err != nil {
+                log.Fatalln(err)
+            }
+            addresses := []string{}
+            for _, address := range addressesarr {
+                nowipaddr := ipcalc.PrefixIPGet(netip.MustParsePrefix(address), ipindex)
+                addresses = append(addresses, netip.PrefixFrom(nowipaddr, nowipaddr.BitLen()).String())
+            }
+            conf += fmt.Sprintf(
+`
+# BEGIN %s
+[Peer]
+AllowedIPs = %s
+PublicKey = %s
+# END %s`, 
+                entry.GetAttributeValue("cn"),
+                strings.Join(addresses, ","),
+                privatekey.Pubkey(entry.GetAttributeValue("wgprivkey")),
+                entry.GetAttributeValue("cn"),
+            )
+        }
+        conf += "\n"
+        SetConfig(name, conf)
     }
-    stdout, err := cmd.StdoutPipe()
-    if err != nil {
-        log.Fatalln(err)
-    }
-    io.WriteString(stdin, privkey)
-    stdin.Close()
-    if err = cmd.Start(); err != nil {
-        log.Fatalln(err)
-    }
-    out, _ := io.ReadAll(stdout)
-    if err = cmd.Wait(); err != nil {
-        log.Fatalln(err)
-    }
-    return strings.TrimSpace(string(out))
 }
