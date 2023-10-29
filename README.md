@@ -15,7 +15,7 @@ make clean && make
 ```
 
 ## Install
-1. Install [LDAPUserTools](https://github.com/Jimmy01240397/LDAPUserTools) [LDAPCLI](https://github.com/NCKUCTF/LDAPCLI) and set your bind config in `/etc/ldap/bind.yaml`
+1. Install [LDAPUserTools](https://github.com/Jimmy01240397/LDAPUserTools) or [LDAPCLI](https://github.com/NCKUCTF/LDAPCLI) and set your bind config in `/etc/ldap/bind.yaml`
 ```
 vi /etc/ldap/bind.yaml
 ```
