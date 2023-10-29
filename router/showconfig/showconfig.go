@@ -31,8 +31,7 @@ func Usage() {
       Show wireguard VPN config.
 
 Options:
-  -h
-        Print help message
+  -h    Print help message
 `, f.Name(), f.Name(), f.Name())
     f.PrintDefaults()
 }
@@ -101,12 +100,14 @@ PrivateKey = %s
 Endpoint = %s
 AllowedIPs = %s
 PublicKey = %s
+PersistentKeepalive = %s
 `, 
         strings.Join(addresses, ","),
         entrys[0].GetAttributeValue("wgprivkey"),
         fmt.Sprintf("%s:%s", servervar["Host"], servervar["ListenPort"]),
         servervar["AllowedIPs"],
         privatekey.Pubkey(servervar["PrivateKey"]),
+        servervar["PersistentKeepalive"],
     )
     if qrcode {
         qrobj, err := qr.New(conf, qr.Medium)

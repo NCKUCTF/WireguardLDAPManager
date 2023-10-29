@@ -18,9 +18,6 @@ func GetAllName() []string {
         log.Fatalln("User not exist.")
     }
     entrys, _ = ldap.Query(fmt.Sprintf("ou=wireguard,cn=%s,ou=people", config.Username), "(objectclass=wireguardKey)", "cn")
-    if len(entrys) == 0 {
-        log.Fatalln("You don't have any private key. Please use `genkey <key name>` to generate a new key.")
-    }
     names := []string{}
     for _, entry := range entrys {
         names = append(names, entry.GetAttributeValue("cn"))
@@ -38,8 +35,11 @@ func ContainName(name string) bool {
 }
 
 func ReadName() string {
-    fmt.Println("Please select your key name.")
     names := GetAllName()
+    if len(names) == 0 {
+        log.Fatalln("You don't have any private key. Please use `genkey <key name>` to generate a new key.")
+    }
+    fmt.Println("Please select your key name.")
     for i := 0; i < len(names); i++ {
         fmt.Printf("%d: %s\n", i+1, names[i])
     }
@@ -51,6 +51,14 @@ func ReadName() string {
         fmt.Scanln(&indexstr)
     }
     return names[index - 1]
+}
+
+func ReadNewName() string {
+    fmt.Println("Please input your new key name.")
+    name := ""
+    fmt.Printf("> ")
+    fmt.Scanln(&name)
+    return name
 }
 
 func Pubkey(privkey string) string {
@@ -73,5 +81,26 @@ func Pubkey(privkey string) string {
         log.Fatalln(err)
     }
     return strings.TrimSpace(string(out))
+}
+
+func Generate(keyname string) {
+    err := exec.Command("ldapwgkeyadd", "-f", config.LDAPConf, keyname, config.Username).Run()
+    if err != nil {
+        log.Fatalln(err)
+    }
+}
+
+func Delete(keynames []string) {
+    err := exec.Command("ldapwgkeydel", "-f", config.LDAPConf, "-k", strings.Join(keynames, ","), config.Username).Run()
+    if err != nil {
+        log.Fatalln(err)
+    }
+}
+
+func Clear() {
+    err := exec.Command("ldapwgkeydel", "-f", config.LDAPConf, "-c", config.Username).Run()
+    if err != nil {
+        log.Fatalln(err)
+    }
 }
 

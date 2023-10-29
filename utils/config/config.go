@@ -2,6 +2,8 @@ package config
 
 import (
     "log"
+    "fmt"
+    "strings"
     "syscall"
     "os"
     "os/user"
@@ -35,4 +37,13 @@ func init() {
     if !exists {
         LDAPConf = "/etc/ldap/bind.yaml"
     }
+}
+
+func Ask(message string) bool {
+    data := ""
+    for strings.ToLower(data) != "y" && strings.ToLower(data) != "n" {
+        fmt.Printf("%s [y/n]: ", message)
+        fmt.Scanln(&data)
+    }
+    return strings.ToLower(data) == "y"
 }

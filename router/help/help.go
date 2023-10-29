@@ -5,6 +5,9 @@ import (
     "flag"
     "WireguardLDAPManager/router/reconfig"
     "WireguardLDAPManager/router/showconfig"
+    "WireguardLDAPManager/router/genkey"
+    "WireguardLDAPManager/router/delkey"
+    "WireguardLDAPManager/router/clearkey"
 )
 
 var f *flag.FlagSet
@@ -30,6 +33,12 @@ func Run(args []string) {
         reconfig.Usage()
     case "showconfig":
         showconfig.Usage()
+    case "genkey":
+        genkey.Usage()
+    case "delkey":
+        delkey.Usage()
+    case "clearkey":
+        clearkey.Usage()
     default:
         fmt.Fprintf(f.Output(), "Unknown command: '%s' (try without commands for a list of commands)\n", subargs[0])
     }

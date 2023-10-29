@@ -29,9 +29,6 @@ func init() {
 
 func GetAllName() []string {
     out, _ := exec.Command("wg", "show", "interfaces").Output()
-    if len(out) == 0 {
-        log.Fatalln("There don't have any wireguard server on this machine. Please create a wireguard server.")
-    }
     return strings.Split(strings.TrimSpace(string(out)), " ")
 }
 
@@ -45,8 +42,11 @@ func ContainName(name string) bool {
 }
 
 func ReadName() string {
-    fmt.Println("Please select your server name.")
     names := GetAllName()
+    if len(names) == 0 {
+        log.Fatalln("There don't have any wireguard server on this machine. Please create a wireguard server.")
+    }
+    fmt.Println("Please select your server name.")
     for i := 0; i < len(names); i++ {
         fmt.Printf("%d: %s\n", i+1, names[i])
     }
@@ -103,7 +103,7 @@ func GetConfig(name string) (conf string, data map[string]string) {
 }
 
 func SetConfig(name, conf string) {
-    f, err := os.OpenFile(filepath.Join(config.WGpath, fmt.Sprintf("%s.conf", name)), os.O_RDWR, 0600)
+    f, err := os.OpenFile(filepath.Join(config.WGpath, fmt.Sprintf("%s.conf", name)), os.O_RDWR|os.O_TRUNC, 0600)
     if err != nil {
         log.Fatalln(err)
     }
@@ -151,11 +151,13 @@ func Reconfig() {
 [Peer]
 AllowedIPs = %s
 PublicKey = %s
+PersistentKeepalive = %s
 # END %s`, 
-                entry.GetAttributeValue("cn"),
+                fmt.Sprintf("%s-%s", config.Username, entry.GetAttributeValue("cn")),
                 strings.Join(addresses, ","),
                 privatekey.Pubkey(entry.GetAttributeValue("wgprivkey")),
-                entry.GetAttributeValue("cn"),
+                servervar["PersistentKeepalive"],
+                fmt.Sprintf("%s-%s", config.Username, entry.GetAttributeValue("cn")),
             )
         }
         conf += "\n"

@@ -6,6 +6,9 @@ import (
     "WireguardLDAPManager/router/help"
     "WireguardLDAPManager/router/reconfig"
     "WireguardLDAPManager/router/showconfig"
+    "WireguardLDAPManager/router/genkey"
+    "WireguardLDAPManager/router/delkey"
+    "WireguardLDAPManager/router/clearkey"
 )
 
 var f *flag.FlagSet
@@ -14,8 +17,7 @@ func Usage() {
     fmt.Fprintf(f.Output(), `Usage: %s COMMAND
 
 Options:
-  -h
-        Print help message
+  -h    Print help message
 `, f.Name())
     f.PrintDefaults()
 
@@ -32,6 +34,7 @@ Here is the list of commands available with a short syntax reminder. Use the
   showconfig <key name>
   genkey <key name>
   delkey <key name>
+  clearkey
 `, f.Name())
 }
 
@@ -43,6 +46,9 @@ func Setup(name string) {
     help.Setup("help")
     reconfig.Setup("reconfig")
     showconfig.Setup("showconfig")
+    genkey.Setup("genkey")
+    delkey.Setup("delkey")
+    clearkey.Setup("clearkey")
 }
 
 func Run(args []string) {
@@ -58,6 +64,12 @@ func Run(args []string) {
         reconfig.Run(subargs[1:])
     case "showconfig":
         showconfig.Run(subargs[1:])
+    case "genkey":
+        genkey.Run(subargs[1:])
+    case "delkey":
+        delkey.Run(subargs[1:])
+    case "clearkey":
+        clearkey.Run(subargs[1:])
     default:
         run(subargs)
     }

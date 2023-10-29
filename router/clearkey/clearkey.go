@@ -1,16 +1,20 @@
-package reconfig
+package clearkey
 
 import (
     "fmt"
     "flag"
+
+    "WireguardLDAPManager/utils/config"
+    "WireguardLDAPManager/models/privatekey"
     "WireguardLDAPManager/models/wireguard"
 )
 
 var f *flag.FlagSet
+var noask bool
 
 func Usage() {
     fmt.Fprintf(f.Output(), `  %s
-      Reconfig wireguard server.
+      Clear all wireguard keys for this user.
 
 Options:
   -h    Print help message
@@ -20,7 +24,7 @@ Options:
 
 func Setup(name string) {
     f = flag.NewFlagSet(name, flag.ExitOnError)
-    //flag
+    f.BoolVar(&noask, "y", false, "Run anyway without ask")
     f.Usage = Usage
 }
 
@@ -32,5 +36,12 @@ func Run(args []string) {
 }
 
 func run(subargs []string) {
+    if !noask && !config.Ask("Continue clear all keys?") {
+        fmt.Println("Key clear cancel.")
+        return
+    }
+
+    privatekey.Clear()
     wireguard.Reconfig()
+    fmt.Println("Key clear success!")
 }
