@@ -18,6 +18,9 @@ var Username string
 func init() {
     nowuser, err := user.Current()
     Username = nowuser.Username
+    if syscall.Getuid() == 0 {
+        log.Fatalln("Please don't run as root user.")
+    }
     ex, err := os.Executable()
     if err == nil {
         exPath := filepath.Dir(ex)

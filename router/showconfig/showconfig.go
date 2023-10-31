@@ -95,20 +95,32 @@ func run(subargs []string) {
 `[Interface]
 Address = %s
 PrivateKey = %s
-
+`,
+        strings.Join(addresses, ","),
+        entrys[0].GetAttributeValue("wgprivkey"),
+    )
+    if _, ok := servervar["DNS"]; ok {
+        conf += fmt.Sprintf(`DNS = %s
+`,
+            servervar["DNS"],
+        )
+    }
+    conf += fmt.Sprintf(`
 [Peer]
 Endpoint = %s
 AllowedIPs = %s
 PublicKey = %s
-PersistentKeepalive = %s
 `, 
-        strings.Join(addresses, ","),
-        entrys[0].GetAttributeValue("wgprivkey"),
         fmt.Sprintf("%s:%s", servervar["Host"], servervar["ListenPort"]),
         servervar["AllowedIPs"],
         privatekey.Pubkey(servervar["PrivateKey"]),
-        servervar["PersistentKeepalive"],
     )
+    if _, ok := servervar["PersistentKeepalive"]; ok {
+        conf += fmt.Sprintf(`PersistentKeepalive = %s
+`,
+            servervar["PersistentKeepalive"],
+        )
+    }
     if qrcode {
         qrobj, err := qr.New(conf, qr.Medium)
         if err != nil {
