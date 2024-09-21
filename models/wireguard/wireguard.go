@@ -29,7 +29,15 @@ func init() {
 
 func GetAllName() []string {
     out, _ := exec.Command("wg", "show", "interfaces").Output()
-    return strings.Split(strings.TrimSpace(string(out)), " ")
+    names := strings.Split(strings.TrimSpace(string(out)), " ")
+    for i := 0; i < len(names); i++ {
+        _, servervar := GetConfig(names[i])
+        if _, ok := servervar["nosync"]; ok {
+            names = append(names[:i], names[i+1:]...)
+            i--
+        }
+    }
+    return names
 }
 
 func ContainName(name string) bool {
